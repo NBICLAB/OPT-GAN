@@ -20,7 +20,7 @@ If you want to specify the parameters of OPT-GAN when optimizing a black box pro
 python experiment_Conformal_Bent_Cigar.py --gamma=1.5 --lambda2=0.3 --pop=30 --optset=150 --func_dim=2 --func_ins=0 --func_id=Conformal_Bent_Cigar --func_alg=OPT-GAN --maxfes=50000
 ```
 
-### Eamples\example_neep
+### Eamples \ example_neep
 This folder include the example of how to use OPT-GAN optimize the “NEEP” problem.
 
 
