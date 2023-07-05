@@ -25,17 +25,15 @@ parser.add_argument("--lambda2", type=float, default=0.3)
 parser.add_argument("--pop", type=int, default=30)
 parser.add_argument("--optset", type=int, default=150)
 #
-parser.add_argument("--my_ins", type=str, default="0")
-parser.add_argument("--my_func", type=str, default="concrete")
-parser.add_argument("--my_alg", type=str, default="OPT-GAN")
+parser.add_argument("--func_ins", type=str, default="0")
+parser.add_argument("--func_id", type=str, default="concrete")
+parser.add_argument("--func_alg", type=str, default="OPT-GAN")
 parser.add_argument("--maxfes", type=int, default=100000)
 args = parser.parse_args()
 
 
 # para: machine CPU/GPU
-ngpu = 0  # number of gpu
-print(torch.cuda.is_available())
-device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
+device = torch.device("cpu")
 
 hyperparameter_defaults = dict(
     # para:function

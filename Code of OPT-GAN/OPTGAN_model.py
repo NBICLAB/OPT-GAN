@@ -57,19 +57,18 @@ class OPTGANMD:
     def __init__(
         self, batch_size, x_dim, z_dim, gen_lr, reg_lr, D_nodes=[50], G_nodes=[50],
     ):
-        print(z_dim)
         self.generator = Generator(z_dim, G_nodes, x_dim)
-        self.discriminator = Discriminator(  # Exploitation Discriminator
+        self.discriminator_I = Discriminator(  # Exploitation Discriminator
             x_dim, D_nodes, 1
         )
-        self.generator_discriminator = Discriminator(  # Exploration Discriminator
+        self.discriminator_R = Discriminator(  # Exploration Discriminator
             x_dim, D_nodes, 1
         )
 
         self.g_optim = torch.optim.Adam(self.generator.parameters(), lr=gen_lr)
-        self.d_optim = torch.optim.Adam(self.discriminator.parameters(), lr=reg_lr)
-        self.gd_optim = torch.optim.Adam(
-            self.generator_discriminator.parameters(), lr=reg_lr
+        self.di_optim = torch.optim.Adam(self.discriminator_I.parameters(), lr=reg_lr)
+        self.dr_optim = torch.optim.Adam(
+            self.discriminator_R.parameters(), lr=reg_lr
         )
 
         self.batch_size = batch_size
@@ -87,35 +86,37 @@ class OPTGANMD:
                 fake_data = self.generator(z_data).data
 
                 ## train Exploration Discriminator
-                self.gd_optim.zero_grad()
+                self.dr_optim.zero_grad()
+                
                 gd_uniform_data = torch.rand_like(real_data) * (upper - lower) + lower
-                gd_real_loss = self.generator_discriminator(gd_uniform_data)
-                gd_fake_loss = self.generator_discriminator(fake_data)
-                gd_gp_loss = self.generator_discriminator.gradient_penalty(
+                
+                gd_real_loss = self.discriminator_R(gd_uniform_data)
+                gd_fake_loss = self.discriminator_R(fake_data)
+                gd_gp_loss = self.discriminator_R.gradient_penalty(
                     gd_uniform_data, fake_data
                 )
                 GD_LOSS = (
                     -torch.mean(gd_real_loss) + torch.mean(gd_fake_loss) + gd_gp_loss
                 )
                 GD_LOSS.backward()
-                self.gd_optim.step()
+                self.dr_optim.step()
 
                 ## train Exploitation Discriminator
-                d_real_loss = self.discriminator(real_data)
-                d_fake_loss = self.discriminator(fake_data)
+                d_real_loss = self.discriminator_I(real_data)
+                d_fake_loss = self.discriminator_I(fake_data)
                 d_gp_loss = self.discriminator.gradient_penalty(real_data, fake_data)
                 D_LOSS = -torch.mean(d_real_loss) + torch.mean(d_fake_loss) + d_gp_loss
 
-                self.d_optim.zero_grad()
+                self.di_optim.zero_grad()
                 D_LOSS.backward()
-                self.d_optim.step()
+                self.di_optim.step()
 
             ## train Generator
             self.g_optim.zero_grad()
             z_data = torch.rand(self.batch_size, self.z_dim) * 2 - 1
             fake_data = self.generator(z_data)
-            g_d_loss = self.discriminator(fake_data)
-            g_gd_loss = self.generator_discriminator(fake_data)
+            g_d_loss = self.discriminator_I(fake_data)
+            g_gd_loss = self.discriminator_R(fake_data)
             G_LOSS = -torch.mean(g_d_loss) - lambda2 * torch.mean(g_gd_loss)
             G_LOSS.backward()
             self.g_optim.step()
@@ -147,24 +148,24 @@ class OPTGANMD:
             fake_data = self.generator(z_data).data
 
             ## train Exploration Discriminator
-            self.gd_optim.zero_grad()
+            self.dr_optim.zero_grad()
             gd_uniform_data = (
                 torch.rand((self.batch_size, self.x_dim)) * (upper - lower) + lower
             )
-            gd_real_loss = self.generator_discriminator(gd_uniform_data)
-            gd_fake_loss = self.generator_discriminator(fake_data)
-            gd_gp_loss = self.generator_discriminator.gradient_penalty(
+            gd_real_loss = self.discriminator_R(gd_uniform_data)
+            gd_fake_loss = self.discriminator_R(fake_data)
+            gd_gp_loss = self.discriminator_R.gradient_penalty(
                 gd_uniform_data, fake_data
             )
             GD_LOSS = -torch.mean(gd_real_loss) + torch.mean(gd_fake_loss) + gd_gp_loss
             GD_LOSS.backward()
-            self.gd_optim.step()
+            self.dr_optim.step()
 
             ## train Generator
             self.g_optim.zero_grad()
             z_data = torch.rand(self.batch_size, self.z_dim) * 2 - 1
             fake_data = self.generator(z_data)
-            g_gd_loss = self.generator_discriminator(fake_data)
+            g_gd_loss = self.discriminator_R(fake_data)
             G_LOSS = -torch.mean(g_gd_loss)
             G_LOSS.backward()
             self.g_optim.step()
@@ -177,7 +178,7 @@ class OPTGANMD:
 
         self.discriminator.apply(weights_init)
         self.generator.apply(weights_init)
-        self.generator_discriminator.apply(weights_init)
+        self.discriminator_R.apply(weights_init)
         [eld.apply(weights_init) for eld in self.encoder_latent_discriminators]
 
 

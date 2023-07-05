@@ -3,7 +3,7 @@ from Variable import *
 from OPTGAN import OPTGAN_min
 
 
-def problem_baojiao(samples):
+def problem_Conformal_Bent_Cigar(samples):
     xd, yd, ud, vd = [1 for _ in range(4)]
     condition = 1e6
     beta = 0.5
@@ -51,16 +51,14 @@ def run(func, ins, dimension, algo):
     config_init = Dict(hyperparameter_defaults)
 
     if func == "Conformal_Bent_Cigar":
-        problem_now = Problem(problem_baojiao)
-        upper = 5
-        lower = -5
+        problem = Problem(problem_Conformal_Bent_Cigar) #define the target black-box problem
+        upper = 5 # the up bound of the black-box problem's solution
+        lower = -5 # the low bound of the black-box problem's solution
 
     config_wandb = Dict(
         {
             "upper": upper,
             "lower": lower,
-            #
-            # "ADD_SIZE_per": config_init.ADD_SIZE_per,
             "lambda2": config_init.lambda2,
             "opt_size": config_init.opt_size,
             "pop_size": config_init.pop_size,
@@ -74,7 +72,7 @@ def run(func, ins, dimension, algo):
     print("--> algorithm %s on function %s ***" % (algo, fun_id + "_" + str(dimension)))
     if algo == "OPT-GAN":  # add solver to investigate here
         fmin = OPTGAN_min(
-            problem_now,
+            problem,
             config_init,
             config_wandb,
             fun_id + "_d" + str(dimension),
@@ -84,9 +82,9 @@ def run(func, ins, dimension, algo):
 
 if __name__ == "__main__":
     print(args.maxfes)
-    func = args.my_func
-    ins = args.my_ins
-    dim = args.my_dim
-    algo = args.my_alg
+    func = args.func_id
+    ins = args.func_ins
+    dim = args.func_dim
+    algo = args.func_alg
     run(func, ins, dim, algo)
 

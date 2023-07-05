@@ -7,7 +7,7 @@ import time
 import torch
 import numpy as np
 
-algo = args.my_alg
+algo = args.func_alg
 
 
 def main(RUN_TIMES):
@@ -206,6 +206,6 @@ def main(RUN_TIMES):
 
 
 if __name__ == "__main__":
-    ins = args.my_ins
+    ins = args.func_ins
     ins = ins.split(",")
     main(ins)

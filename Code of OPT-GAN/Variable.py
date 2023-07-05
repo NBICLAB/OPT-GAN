@@ -20,22 +20,15 @@ parser.add_argument("--lambda2", type=float, default=0.3)
 parser.add_argument("--pop", type=int, default=30)
 parser.add_argument("--optset", type=int, default=150)
 
-parser.add_argument("--my_dim", type=int, default="2")
-parser.add_argument("--my_ins", type=int, default="0")
-parser.add_argument("--my_func", type=str, default="Conformal_Bent_Cigar")
-parser.add_argument("--my_alg", type=str, default="OPT-GAN")
+parser.add_argument("--func_dim", type=int, default="2")
+parser.add_argument("--func_ins", type=int, default="0")
+parser.add_argument("--func_id", type=str, default="Conformal_Bent_Cigar")
+parser.add_argument("--func_alg", type=str, default="OPT-GAN")
 parser.add_argument("--maxfes", type=int, default=50000)
 
 args = parser.parse_args()
 
-
-# para: machine CPU/GPU
-ngpu = 0  # gpu数目
-# print(torch.__version__)
-print(torch.cuda.is_available())
-device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
-# path_all = "./"
-# os.makedirs(path_all, exist_ok=True)
+device = torch.device("cpu")
 
 hyperparameter_defaults = dict(
     # para:function
@@ -65,13 +58,6 @@ hyperparameter_defaults = dict(
 # para:show
 En_SCALE = False
 ENABLE_LOGGING = True
-
-# datapath = "PUT_MY_BBOB_DATA_PATH"
-# opts = dict(
-#     algid="ALG_NAME", comments="PUT MORE DETAILED INFORMATION, PARAMETER SETTINGS ETC"
-# )
-
-# fit = fgeneric.LoggingFunction(datapath, **opts)
 
 
 class Dict(dict):
@@ -120,13 +106,6 @@ def fitnessf(problem, x):
     for i in range(size):
         fitness[i, :] = problem(x[i, :])
     return fitness
-
-
-# def fitness_bbob(X):
-#     F = fit(X) - fit._getftarget()
-#     if F.ndim == 1:
-#         F = np.expand_dims(F, axis=1)  # 在相应的axis轴上扩展维度
-#     return F
 
 
 def min_distance(data, size):
