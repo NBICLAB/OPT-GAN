@@ -1,7 +1,7 @@
 # OPT-GAN: A Broad-Spectrum Global Optimizer for Black-box Problems by Learning Distribution
 
 ## Usage
-This repository contains the source code of OPT-GAN and examples of how to use it to optimize given black-box problems, such as 'Conformal Bent Cigar' or 'NEEP.
+This repository contains the source code of OPT-GAN and examples of how to use it to optimize given black-box problems, such as 'Conformal Bent Cigar' or 'NEEP'.
 
 ### Code of OPT-GAN
 This folder includes the code for OPT-GAN and an example of how to use it to optimize the 'Conformal Bent Cigar' problem. If you wish to use OPT-GAN for optimizing other black-box problems, you will need to replace the corresponding content with the target problem.
