@@ -36,13 +36,11 @@ def problem_Conformal_Bent_Cigar(samples):
     yp = n / (m ** 2 + n ** 2)
     x0 = (xp - shift_forw[:, 0]) / scale_forw[:, 0]
     y0 = (yp - shift_forw[:, 1]) / scale_forw[:, 1]
-    # 最优点(2.5,-2.5)
     z0 = condition * x0 ** 2 + y0 ** 2
     """fitness = np.zeros((t2.shape[0], 1))
     for i in range(samples.shape[0]):
         fitness[i, :] = problem(t2[i, :])"""
     F = np.squeeze(Fval)
-    # F = F-min(F)+1
     F = np.log(F) - np.log(Fadd)
     return F
 
